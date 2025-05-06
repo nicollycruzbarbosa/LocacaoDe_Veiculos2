@@ -1,30 +1,31 @@
 <?php
 
-// incluir o autoload do composer para carregar automaticamente as classe utilizadas
-require_once __DIR__ . '/../vendor/autoload.php';
+// Incluir o autoload do composer para carregar automaticamente as classes utilizadas
+require_once __DIR__.'/../vendor/autoload.php';
 
-// incluir o arquivo com as variáveis
-require_once __DIR__ . '/../config/config.php';
+// Incluir o arquivo com as variáveis
+require_once __DIR__.'/../config/config.php';
 
 session_start();
 
-// inserir a classe de autenticação
+// Inserir a classe de autenticação
 use Services\Auth;
 
-// inicia a variável de mensagens de erro
+// Inicializa a variável para mensagem de erro
 $mensagem = '';
 
-// instanciar a classe de autenticação
+// Instanciar a classe de autenticação
 $auth = new Auth();
 
-// verificar a autenticação
+// Verificar se já foi autenticado
 if(Auth::verificarLogin()){
 
-    // redirecionar para a página principal
-    header ('Location:index.php');
+    //Redirecionar para a página principal
+    header('Location:index.php');
+    exit;
 }
 
-// verificar se o formulário foi enviado
+// Verificar se o formulário foi enviado
 if ($_SERVER['REQUEST_METHOD'] === 'POST'){
 
     $username = $_POST['username'] ?? '';
@@ -32,15 +33,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
     $password = $_POST['password'] ?? '';
 
     if($auth->login($username, $password)){
-        // se o login for correta entre
-        header ('Location: index.php');
+        // Se o login for correto direciona para página inicial
+        header('Location: index.php');
         exit;
 
-    } else{
-        $mensagem = 'Falha ao executar o login! Verifique se e-mail e senha estão corretos.'
+    } else {
+        $mensagem = 'Falha ao executar o login! Verifique se o usuário e a senha estão corretos.';
     }
 }
-
 
 ?>
 
@@ -74,14 +74,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
         <div class="card">
             <!-- Título do card -->
             <div class="card-header">
-                <h4 class="mb-1">Login</h4>
+                <h4 class="mb-0">Login</h4>
             </div>
 
             <!-- Corpo do card -->
             <div class="card-body">
 
-                <form action="post" class="needs-validation" novalidate>
-                    <input type="hidden">
+            <?php if ($mensagem): ?>
+                <div class="alert alert-danger"><?=htmlspecialchars($mensagem) ?></div>
+                <?php endif; ?>
+
+                <form method="post" class="needs-validation" novalidate>
+                
 
                     <div class="mb-3">
                         <label for="user" class="form-label">
@@ -94,8 +98,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
                         <label for="password" class="form-label">
                             Senha:
                         </label>
-                        <input type="password" name="password" id="password" class="form-control" required>
-                        <span class="password-toggle mt-3" onclick="togglePassword()"><i class="bi bi-eye"></i></span>
+                        <input type="password" name="password" class="form-control" id="password" required>
+                        <span class="password-toggle mt-3" onclick="togglePassword()">
+                            <i class="bi bi-eye"></i>
+                        </span>
                     </div>
 
                     <button type="submit" class="btn btn-warning w-100">Entrar</button>
@@ -105,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
     </div>
     
     <script>
-        function togglePassword() {
+        function togglePassword(){
             let passwordInput = document.getElementById('password');
             passwordInput.type = (passwordInput.type === 'password') ? 'text' : 'password';
         }
